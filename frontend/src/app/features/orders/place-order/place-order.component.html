@@ -1,0 +1,33 @@
+<div class="container">
+  <div class="card">
+    <h2>Place an Order</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>Customer ID</label>
+      <input formControlName="customerId" placeholder="customer-123" />
+
+      <div formArrayName="items" style="margin-top:16px;">
+        <label>Items</label>
+        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i"
+             style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <select formControlName="productId" style="flex:2;">
+            <option value="" disabled selected>Select product</option>
+            <option *ngFor="let p of products" [value]="p.id">{{ p.name }} (${{ p.price }})</option>
+          </select>
+          <input type="number" formControlName="quantity" min="1" style="flex:1;" />
+          <button type="button" (click)="removeItem(i)" [disabled]="items.length === 1"
+                  style="background:#ef4444;">Remove</button>
+        </div>
+        <button type="button" (click)="addItem()" style="background:#64748b;">+ Add item</button>
+      </div>
+
+      <div *ngIf="errorMessage" style="color:#991b1b; margin-top:12px;">{{ errorMessage }}</div>
+
+      <div style="margin-top:20px;">
+        <button type="submit" [disabled]="submitting">
+          {{ submitting ? 'Placing order...' : 'Place Order' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
