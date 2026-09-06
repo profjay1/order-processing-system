@@ -7,20 +7,24 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version>
+        <version>4.0.2</version>
         <relativePath/>
     </parent>
 
     <groupId>com.portfolio</groupId>
     <artifactId>order-processing-system</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>order-processing-system</name>
     <description>Distributed order processing system demonstrating idempotency, async messaging, caching and resilience</description>
 
     <properties>
+        <!-- Spring Boot 4 requires Java 17+ / Jakarta EE 11 / Servlet 6.1 baseline.
+             Java 21 (LTS) is used here, consistent with the parent's recommendation
+             to use the latest available LTS release. -->
         <java.version>21</java.version>
-        <testcontainers.version>1.20.1</testcontainers.version>
-        <springdoc.version>2.6.0</springdoc.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
+        <!-- springdoc-openapi 3.x is the line that targets Spring Boot 4 / Spring Framework 7 -->
+        <springdoc.version>3.0.0</springdoc.version>
     </properties>
 
     <dependencies>

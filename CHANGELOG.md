@@ -6,6 +6,15 @@ and [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-06
+### Changed
+- Upgraded backend to **Spring Boot 4.0.2** (Spring Framework 7, Jakarta EE 11 / Servlet 6.1 baseline).
+- Upgraded `springdoc-openapi` to 3.0.0 (first line compatible with Spring Boot 4).
+- Upgraded frontend to **Angular 22**; raised minimum Node.js version to 22.12+ in the frontend Dockerfile and CI pipeline.
+- Bumped Testcontainers to 1.20.4.
+### Added
+- ADR-0005 documenting the rationale and trade-offs of the version upgrade.
+
 ## [1.0.0] - 2026-09-06
 ### Added
 - Order placement API with idempotency-key support (Redis + DB unique constraint).

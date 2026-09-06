@@ -6,8 +6,9 @@ retry/dead-letter handling, cache-vs-correctness separation, pessimistic
 locking under concurrency, and full integration test coverage against real
 infrastructure via Testcontainers.
 
-**Stack:** Java 21 / Spring Boot 3 · Angular 18 · PostgreSQL 16 · Redis 7 ·
-RabbitMQ 3 · Docker Compose · GitHub Actions
+**Stack:** Java 21 / Spring Boot 4 (Spring Framework 7, Jakarta EE 11) ·
+Angular 22 · PostgreSQL 16 · Redis 7 · RabbitMQ 3 · Docker Compose ·
+GitHub Actions
 
 ## Why this project exists
 
@@ -67,6 +68,22 @@ order-processing-system/
 ├── docker-compose.yml
 └── CHANGELOG.md
 ```
+
+## Version requirements
+
+Spring Boot 4 and Angular 22 both bumped their platform floors — make sure
+your local tooling matches before running this outside Docker:
+
+| Tool | Required version | Why |
+|---|---|---|
+| Java | 17+ (21 LTS used here) | Spring Boot 4 baseline (Jakarta EE 11 / Servlet 6.1) |
+| Node.js | 22.12+ | Angular 22 baseline |
+| Maven | 3.9+ | Spring Boot 4 parent POM |
+
+If you're running the backend/frontend directly from IntelliJ/VS Code
+rather than Docker, confirm `java -version` and `node -v` meet these
+floors first — this is the single most common local setup failure after
+a major-version upgrade like this one.
 
 ## Running locally
 
