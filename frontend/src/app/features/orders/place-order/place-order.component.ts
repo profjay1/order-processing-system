@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
@@ -13,24 +13,22 @@ import { Product } from '../../../core/models/order.model';
   templateUrl: './place-order.component.html'
 })
 export class PlaceOrderComponent implements OnInit {
-  products: Product[] = [];
-  submitting = false;
-  errorMessage: string | null = null;
+  private fb = inject(FormBuilder);
+  private orderService = inject(OrderService);
+  private productService = inject(ProductService);
+  private router = inject(Router);
+
+  products = signal<Product[]>([]);
+  submitting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   form: FormGroup = this.fb.group({
     customerId: ['', Validators.required],
     items: this.fb.array([this.createItemGroup()])
   });
 
-  constructor(
-    private fb: FormBuilder,
-    private orderService: OrderService,
-    private productService: ProductService,
-    private router: Router
-  ) {}
-
   ngOnInit(): void {
-    this.productService.listProducts().subscribe(products => (this.products = products));
+    this.productService.listProducts().subscribe(products => this.products.set(products));
   }
 
   get items(): FormArray {
@@ -58,12 +56,9 @@ export class PlaceOrderComponent implements OnInit {
       return;
     }
 
-    this.submitting = true;
-    this.errorMessage = null;
+    this.submitting.set(true);
+    this.errorMessage.set(null);
 
-    // Generated client-side per submission attempt group; a real client
-    // would persist this across retries of the *same* logical action so
-    // the backend's idempotency check is meaningful.
     const idempotencyKey = crypto.randomUUID();
 
     this.orderService.placeOrder({
@@ -73,8 +68,8 @@ export class PlaceOrderComponent implements OnInit {
     }).subscribe({
       next: order => this.router.navigate(['/orders', order.id]),
       error: err => {
-        this.submitting = false;
-        this.errorMessage = err.error?.message ?? 'Failed to place order. Please try again.';
+        this.submitting.set(false);
+        this.errorMessage.set(err.error?.message ?? 'Failed to place order. Please try again.');
       }
     });
   }

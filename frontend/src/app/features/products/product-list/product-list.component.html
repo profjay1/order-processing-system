@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let p of products" style="border-bottom:1px solid #f1f5f9;">
+        <tr *ngFor="let p of products()" style="border-bottom:1px solid #f1f5f9;">
           <td style="padding:8px 0;">{{ p.name }}</td>
           <td>${{ p.price }}</td>
           <td>{{ p.stockQuantity }}</td>

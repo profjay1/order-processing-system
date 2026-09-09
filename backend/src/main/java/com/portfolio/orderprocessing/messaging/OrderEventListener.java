@@ -5,9 +5,8 @@ import com.portfolio.orderprocessing.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.resilience.annotation.Retryable;
 
 /**
  * Consumes OrderCreatedEvent and triggers payment processing asynchronously.
@@ -24,10 +23,7 @@ public class OrderEventListener {
     private final PaymentService paymentService;
 
     @RabbitListener(queues = "order.created.queue")
-    @Retryable(
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2)
-    )
+    @Retryable(maxRetries = 2, delay = 1000, multiplier = 2)
     public void handleOrderCreated(OrderCreatedEvent event) {
         log.info("Processing payment for order {}", event.orderId());
         paymentService.processPayment(event.orderId(), event.totalAmount());

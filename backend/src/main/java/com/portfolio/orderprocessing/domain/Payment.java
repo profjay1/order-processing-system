@@ -39,7 +39,7 @@ public class Payment {
     private String failureReason;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     public enum PaymentStatus {
