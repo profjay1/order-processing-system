@@ -54,13 +54,15 @@ public class Order {
     private List<OrderItem> items = new ArrayList<>();
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private Instant updatedAt;
 
     @Version
+    @Column(nullable = false)
     private Long version;
 
     public void addItem(OrderItem item) {

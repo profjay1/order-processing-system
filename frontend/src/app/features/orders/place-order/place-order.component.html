@@ -12,7 +12,7 @@
              style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
           <select formControlName="productId" style="flex:2;">
             <option value="" disabled selected>Select product</option>
-            <option *ngFor="let p of products" [value]="p.id">{{ p.name }} (${{ p.price }})</option>
+            <option *ngFor="let p of products()" [value]="p.id">{{ p.name }} (${{ p.price }})</option>
           </select>
           <input type="number" formControlName="quantity" min="1" style="flex:1;" />
           <button type="button" (click)="removeItem(i)" [disabled]="items.length === 1"
@@ -21,11 +21,11 @@
         <button type="button" (click)="addItem()" style="background:#64748b;">+ Add item</button>
       </div>
 
-      <div *ngIf="errorMessage" style="color:#991b1b; margin-top:12px;">{{ errorMessage }}</div>
+      <div *ngIf="errorMessage()" style="color:#991b1b; margin-top:12px;">{{ errorMessage() }}</div>
 
       <div style="margin-top:20px;">
-        <button type="submit" [disabled]="submitting">
-          {{ submitting ? 'Placing order...' : 'Place Order' }}
+        <button type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Placing order...' : 'Place Order' }}
         </button>
       </div>
     </form>

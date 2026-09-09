@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/order.model';
 
@@ -10,11 +10,11 @@ import { Product } from '../../../core/models/order.model';
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
-  products: Product[] = [];
+  private productService = inject(ProductService);
 
-  constructor(private productService: ProductService) {}
+  products = signal<Product[]>([]);
 
   ngOnInit(): void {
-    this.productService.listProducts().subscribe(products => (this.products = products));
+    this.productService.listProducts().subscribe(products => this.products.set(products));
   }
 }
