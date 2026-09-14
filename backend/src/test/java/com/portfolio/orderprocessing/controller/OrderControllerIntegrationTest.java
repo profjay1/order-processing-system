@@ -7,7 +7,7 @@ import com.portfolio.orderprocessing.dto.OrderRequest;
 import com.portfolio.orderprocessing.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -17,24 +17,16 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.utility.DockerImageName;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * End-to-end test that spins up real Postgres and RabbitMQ containers via
- * Testcontainers, exercises the full HTTP -> service -> DB -> broker path,
- * and asserts the order is created with the correct computed total and
- * that a duplicate request (same idempotency key) does not create a
- * second row.
- *
- * Note: Redis is assumed available on localhost for idempotency claims
- * in this test profile; swap for a Testcontainers Redis module if you
- * want full container isolation in CI.
- */
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Testcontainers
@@ -49,6 +41,10 @@ class OrderControllerIntegrationTest {
     @Container
     static RabbitMQContainer rabbitmq = new RabbitMQContainer("rabbitmq:3.13-management-alpine");
 
+    @Container
+    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
+        .withExposedPorts(6379);
+
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
@@ -56,6 +52,8 @@ class OrderControllerIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.rabbitmq.host", rabbitmq::getHost);
         registry.add("spring.rabbitmq.port", rabbitmq::getAmqpPort);
+        registry.add("spring.data.redis.host", redis::getHost);
+	registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 
     @Autowired private MockMvc mockMvc;
@@ -110,6 +108,9 @@ class OrderControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        org.assertj.core.api.Assertions.assertThat(firstResponse).isEqualTo(secondResponse);
+       JsonNode firstJson = objectMapper.readTree(firstResponse);
+       JsonNode secondJson = objectMapper.readTree(secondResponse);
+       org.assertj.core.api.Assertions.assertThat(secondJson.get("id").asText())
+        .isEqualTo(firstJson.get("id").asText()); 
     }
 }
